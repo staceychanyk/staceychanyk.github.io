@@ -1,0 +1,293 @@
+/* General body styles for the website */
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f0f0f0;
+}
+
+/* Styling headings */
+h1, h2 {
+  color: #333;
+}
+
+/* Ensuring images fit nicely */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Video background styling */
+#video-bg {
+  position: fixed; /* Fixes the video to cover the entire screen */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Makes the video scale to cover the screen */
+  z-index: -1; /* Places the video behind all other content */
+}
+
+/* Header styling */
+header {
+  background-color: rgba(0, 51, 102, 0.9); /* Dark blue with slight transparency to see video */
+  padding: 15px;
+  position: sticky; /* Keeps header at the top when scrolling */
+  top: 0;
+  z-index: 10; /* Ensures header stays above other content */
+  border-bottom: 3px solid #ffcc00; /* Bright yellow border for a fun look */
+}
+
+/* Navigation styling */
+nav {
+  background-color: transparent; /* No extra background, uses header's */
+  color: #fff;
+}
+
+nav ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  display: flex;
+  justify-content: center;
+}
+
+nav ul li {
+  display: inline;
+  margin: 0 1rem;
+}
+
+nav a {
+  text-decoration: none;
+  color: #fff;
+  font-size: 1.2em;
+  font-weight: bold;
+  transition: color 0.3s; /* Smooth color change on hover */
+}
+
+nav a:hover {
+  color: #ffcc00; /* Bright yellow on hover for a fun effect */
+}
+
+/* Logo section styling */
+.logo-cont {
+  display: flex;
+  justify-content: center; /* Centers horizontally */
+  align-items: center; /* Centers vertically */
+  width: 200px; /* Fixed width to create circular shape */
+  height: 200px; /* Fixed height to match width for circle */
+  margin: 20px auto; /* Centers the section on the page */
+  background-color: rgba(255, 255, 255, 0.9); /* White background with transparency */
+  border-radius: 50%; /* Makes the section circular */
+}
+
+.logo {
+  max-width: 300px; /* Slightly smaller than section to fit inside circle */
+  max-height: 300px; /* Ensures GIF stays proportional */
+  border-radius: 50%; /* Makes the logo itself circular */
+}
+
+/* Section styling */
+section {
+  padding: 20px;
+  margin: 3% 5%;
+  background-color: rgba(255, 255, 255, 0.9); /* White with slight transparency to see video */
+  border-radius: 5px;
+}
+
+/* Grid container for articles */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.article-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+.article-card img {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.article-card h3 {
+  color: #333;
+  font-size: 1.2rem;
+  margin-bottom: 5px;
+}
+
+.article-card p {
+  color: #666;
+}
+
+.article-card .meta {
+  color: #999;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+/* Footer styling */
+footer {
+  background-color: rgba(0, 51, 102, 0.9); /* Matches header for consistency */
+  color: #fff;
+  padding: 20px;
+  text-align: center;
+  border-top: 3px solid #ffcc00; /* Yellow border to match header */
+}
+
+footer p {
+  margin: 0;
+  font-size: 1em;
+}
+
+footer a {
+  color: #fff;
+  margin: 0 10px;
+  font-size: 1.5em;
+  transition: color 0.3s;
+}
+
+footer a:hover {
+  color: #ffcc00; /* Yellow on hover to match nav */
+}
+
+/* General link styling */
+a {
+  text-decoration: none;
+  color: #fff;
+}
+
+.contributor-table {
+  width: 100%;
+  max-width: 900px;
+  margin: 20px auto;
+  border-collapse: collapse;
+  background-color: rgba(255, 255, 255, 0.9); /* Matches section background */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 
+  Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  border-radius: 8px; /* Matches article-card */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Matches article-card */
+}
+
+.contributor-table th,
+.contributor-table td {
+  padding: 15px;
+  text-align: left;
+  border-bottom: 1px solid rgba(0, 51, 102, 0.2); /* Subtle blue border */
+  color: #666; /* Matches article-card p */
+}
+
+.contributor-table th {
+  background-color: rgba(0, 51, 102, 0.9); /* Matches header/footer */
+  color: #fff; /* White text for contrast */
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 0.9rem; /* Slightly smaller, like .meta */
+  border-bottom: 2px solid #ffcc00; /* Yellow accent */
+}
+
+.contributor-table td {
+  font-size: 1rem; /* Matches article-card p */
+}
+
+.contributor-table tr:hover {
+  background-color: rgba(255, 204, 0, 0.1); /* Yellow-tinted hover */
+}
+
+section h2, section p {
+  text-align: center;
+}
+
+/* Responsive design with media queries */
+@media (max-width: 768px) {
+  /* Adjust navigation for smaller screens */
+  nav ul {
+    flex-direction: column; /* Stack nav items vertically */
+    align-items: center;
+  }
+
+  nav ul li {
+    margin: 10px 0; /* More vertical spacing */
+  }
+
+  nav a {
+    font-size: 1em; /* Smaller font for mobile */
+  }
+
+  /* Adjust logo section size */
+  .logo-cont {
+    width: 250px; /* Smaller circle for tablets */
+    height: 250px;
+  }
+
+  .logo {
+    max-width: 200px; /* Smaller logo for tablets */
+    max-height: 200px;
+  }
+
+  /* Adjust section padding and margins */
+  section {
+    margin: 5% 3%;
+    padding: 15px;
+  }
+
+  /* Adjust grid for articles */
+  .grid-container {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Smaller columns */
+  }
+
+  .contributor-table {
+    max-width: 100%;
+    margin: 10px 0;
+  }
+
+  .contributor-table th,
+  .contributor-table td {
+    padding: 10px;
+    font-size: 0.9rem; /* Smaller for tablets */
+  }
+}
+
+@media (max-width: 480px) {
+  /* Further adjustments for very small screens (phones) */
+  h2 {
+    font-size: 1.5em; /* Smaller headings */
+  }
+
+  .article-card h3 {
+    font-size: 1em; /* Smaller article titles */
+  }
+
+  .article-card p {
+    font-size: 0.9em; /* Smaller text */
+  }
+
+  .logo-cont {
+    width: 200px; /* Even smaller circle for phones */
+    height: 200px;
+  }
+
+  .logo {
+    max-width: 150px; /* Even smaller logo for phones */
+    max-height: 150px;
+  }
+
+  footer a {
+    font-size: 1.2em; /* Smaller social media icons */
+  }
+
+  .contributor-table th,
+  .contributor-table td {
+    padding: 8px;
+    font-size: 0.8rem; /* Even smaller for phones */
+  }
+
+  .contributor-table th {
+    font-size: 0.8rem;
+  }
+}
