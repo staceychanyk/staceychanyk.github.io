@@ -1,35 +1,617 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width">
-  <title>replit</title>
-  <style>
-    .redbox {
-      background-color: red;
-      width: 200px;
-      margin: 10px;
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>PET PALS — Love for Everyone</title>
+<meta name="description" content="PET PALS — Rent a pet for a joyful, face-to-face play session. Swipe to find your match. Love for Everyone." />
+<style>
+  :root{
+    --bg:#fffefb;
+    --ink:#222;
+    --muted:#666;
+    --lime:#dfffc1;   /* pastel lime */
+    --pink:#ffd6e9;   /* pastel pink */
+    --yellow:#fff2b8; /* pastel yellow */
+    --accent:#ff6fb1; /* slightly stronger pink for focus */
+    --card:#ffffff;
+    --shadow:0 8px 24px rgba(0,0,0,.1);
+    --radius:18px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; font:16px/1.5 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, Apple Color Emoji, Segoe UI Emoji;
+    color:var(--ink); background:
+      radial-gradient(1200px 600px at -10% -10%, var(--lime), transparent 60%),
+      radial-gradient(900px 500px at 110% -10%, var(--pink), transparent 55%),
+      radial-gradient(1200px 700px at 50% 110%, var(--yellow), transparent 55%),
+      var(--bg);
+    overflow-x:hidden;
+  }
+  a{color:#0b6; text-decoration:none}
+  .app{max-width:1100px; margin:0 auto; padding:12px 16px 80px}
+  header{
+    display:flex; align-items:center; gap:12px; padding:8px 6px 14px; position:sticky; top:0;
+    backdrop-filter:saturate(1.2) blur(6px); z-index:40;
+  }
+  header .logo{display:flex; align-items:center; gap:10px}
+  header img{height:46px; width:auto; border-radius:10px; background:#fff; box-shadow:var(--shadow)}
+  header h1{font-size:20px; margin:0 0 -2px 0; letter-spacing:.6px}
+  header small{color:var(--muted)}
 
-    #red1 {
-      color: white;
-    }
-  </style>
+  nav{
+    margin-left:auto; display:flex; gap:6px; flex-wrap:wrap;
+  }
+  .navbtn{
+    border:0; background:#fff; padding:8px 12px; border-radius:999px; box-shadow:var(--shadow);
+    cursor:pointer; font-weight:600;
+  }
+  .navbtn[aria-current="page"]{outline:3px solid var(--accent);}
+
+  .screen{display:none}
+  .screen.active{display:block}
+
+  /* AI Dog guide */
+  .coach{
+    position:fixed; right:12px; bottom:12px; z-index:45; display:flex; align-items:flex-end; gap:10px;
+  }
+  .coach .bubble{
+    max-width:min(340px, 70vw); background:#fff; border-radius:16px; padding:12px 14px; box-shadow:var(--shadow);
+    border:3px solid var(--pink);
+  }
+  .coach .dog{
+    width:58px; height:58px; border-radius:50%; overflow:hidden; border:3px solid #fff; box-shadow:var(--shadow);
+    background:#fff;
+  }
+  .chiprow{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px}
+  .chip{
+    background:var(--yellow); border:0; padding:6px 10px; border-radius:999px; cursor:pointer; font-weight:600;
+  }
+
+  /* Choiceboard / filters */
+  .filters{
+    display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    background:#fff; border-radius:var(--radius); padding:12px; box-shadow:var(--shadow);
+  }
+  .filters label{font-size:12px; color:var(--muted)}
+  .filters .row{display:flex; flex-direction:column; gap:4px}
+  select,input,textarea{
+    width:100%; padding:10px 12px; border-radius:12px; border:1px solid #ddd; background:#fff;
+  }
+  .applybar{display:flex; gap:10px; flex-wrap:wrap; margin-top:8px}
+  .btn{
+    border:0; padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:700;
+    background:var(--lime); box-shadow:var(--shadow);
+  }
+  .btn.primary{background:var(--accent); color:#fff}
+  .btn.ghost{background:#fff}
+  .btn.icon{display:inline-flex; align-items:center; gap:8px}
+
+  /* Deck */
+  .deckwrap{margin-top:16px; height:min(68vh,680px); position:relative}
+  .card{
+    position:absolute; inset:0; margin:auto; width:min(560px, 95%); height:100%;
+    background:var(--card); border-radius:22px; box-shadow:var(--shadow); overflow:hidden;
+    touch-action:none; user-select:none; transform-origin:50% 90%;
+    display:grid; grid-template-rows:auto 1fr auto;
+  }
+  .card img{width:100%; height:46%; object-fit:cover}
+  .badge{
+    position:absolute; top:10px; left:10px; background:#000000a0; color:#fff; padding:6px 10px; border-radius:999px; font-weight:700
+  }
+  .meta{padding:10px 14px 0}
+  .meta h3{margin:0 0 4px; font-size:20px}
+  .pillrow{display:flex; gap:8px; flex-wrap:wrap; color:#333}
+  .pill{background:var(--yellow); padding:6px 10px; border-radius:999px; font-weight:600}
+  .diet{background:var(--pink)}
+  .loc{background:var(--lime)}
+  .controls{
+    display:flex; justify-content:center; gap:14px; padding:10px 14px 16px;
+  }
+  .controls .ctrl{
+    width:56px; height:56px; border-radius:999px; border:0; box-shadow:var(--shadow); cursor:pointer; font-size:20px; font-weight:900;
+    background:#fff;
+  }
+  .controls .like{outline:3px solid #2ecc71}
+  .controls .nope{outline:3px solid #ff5c5c}
+  .controls .info{outline:3px solid #888}
+
+  /* Lists */
+  .grid{display:grid; gap:12px; grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+  .mini{
+    background:#fff; border-radius:16px; box-shadow:var(--shadow); overflow:hidden
+  }
+  .mini img{width:100%; height:150px; object-fit:cover}
+  .mini .pad{padding:8px 10px}
+
+  /* Modals / drawers */
+  .overlay{position:fixed; inset:0; background:rgba(0,0,0,.45); display:none; align-items:center; justify-content:center; padding:14px; z-index:60}
+  .overlay.open{display:flex}
+  .modal{max-width:720px; width:100%; background:#fff; border-radius:18px; box-shadow:var(--shadow); overflow:hidden}
+  .modal header{position:unset; backdrop-filter:none}
+  .modal .body{padding:14px}
+  .close{margin-left:auto}
+  .success{padding:24px; text-align:center}
+
+  /* Footer */
+  footer{margin-top:24px; color:var(--muted); font-size:13px}
+
+  /* AI screening */
+  .screening .q{background:#fff; padding:12px; border-radius:14px; box-shadow:var(--shadow)}
+  .screening .q + .q{margin-top:10px}
+  .warn{background:#fff3f3; border:1px solid #ffd0d0; padding:10px 12px; border-radius:12px}
+
+  @media (max-width:520px){
+    header img{height:40px}
+    .controls .ctrl{width:52px;height:52px}
+  }
+</style>
 </head>
-
 <body>
-  <div></div>
-  <main>
-    <section>
-      <article class="redbox" id="red1">blog 1</article>
-      <article class="redbox">blog 2</article>
-      <article class="redbox">blog 3</article>
-    </section>
+<div class="app" id="app">
+  <header>
+    <!-- Replace src with your own path if needed -->
+    <div class="logo"><img src="petpals_logo.png" alt="PET PALS logo" /><div>
+      <h1>PET PALS</h1><small>Love for Everyone</small>
+    </div></div>
+    <nav>
+      <button class="navbtn" data-goto="home" aria-current="page">Home</button>
+      <button class="navbtn" data-goto="browse">Browse</button>
+      <button class="navbtn" data-goto="filters">Filters</button>
+      <button class="navbtn" data-goto="faves">Favourites</button>
+      <button class="navbtn" data-goto="help">Help</button>
+    </nav>
+  </header>
 
-  </main>
+  <!-- HOME -->
+  <section class="screen active" id="home">
+    <div class="filters" style="margin-top:10px">
+      <div class="row"><label>Dream pet (free text)</label><input id="dreamInput" placeholder="e.g. small, cuddly bunny with calm vibe"></div>
+      <div class="row"><label>Quick start</label>
+        <div class="applybar">
+          <button class="btn ghost" id="quickDogs">I like dogs</button>
+          <button class="btn ghost" id="quickCats">I like cats</button>
+          <button class="btn ghost" id="quickSmall">Small pets</button>
+          <button class="btn primary" id="startNow">Start swiping</button>
+        </div>
+      </div>
+    </div>
 
+    <h2 style="margin:18px 6px 10px">New user suitability screening</h2>
+    <div class="screening">
+      <div class="q">
+        <label><input type="checkbox" id="q_age"> I am 18+ years old.</label>
+      </div>
+      <div class="q">
+        <label><input type="checkbox" id="q_handle"> I can handle animals gently and follow staff guidance.</label>
+      </div>
+      <div class="q">
+        <label><input type="checkbox" id="q_allergy"> I have no severe pet allergies (or I will bring medication).</label>
+      </div>
+      <div class="q">
+        <label><input type="checkbox" id="q_supervised"> I understand experiences are supervised and for emotional comfort only.</label>
+      </div>
+      <div class="q">
+        <label><input type="checkbox" id="q_commit"> I will respect animal welfare and not treat sessions as gifts or surprises.</label>
+      </div>
+      <div class="applybar">
+        <button class="btn primary" id="screeningPass">I agree — continue</button>
+        <div id="screeningMsg" class="warn" style="display:none">Please tick all boxes to continue. If you’re not ready, view <a href="#help" data-goto="help" class="navlink">Help</a> for support.</div>
+      </div>
+    </div>
 
+    <h2 style="margin:18px 6px 6px">How it works</h2>
+    <ol style="margin:0 6px 10px; padding-left:18px">
+      <li>Describe your dream pet → set filters</li>
+      <li>Swipe right ❤️ to like, left ❌ to pass</li>
+      <li>Confirm booking time & face-to-face pickup</li>
+    </ol>
+  </section>
+
+  <!-- BROWSE -->
+  <section class="screen" id="browse">
+    <div class="deckwrap" id="deckwrap"></div>
+    <div class="controls">
+      <button class="ctrl nope" id="btnNope" title="Nope">✕</button>
+      <button class="ctrl info" id="btnInfo" title="Details">ℹ︎</button>
+      <button class="ctrl like" id="btnLike" title="Like">♥</button>
+    </div>
+  </section>
+
+  <!-- FILTERS -->
+  <section class="screen" id="filters">
+    <div class="filters">
+      <div class="row">
+        <label>Species</label>
+        <select id="f_species" multiple>
+          <option>Dog</option><option>Cat</option><option>Rabbit</option><option>Hamster</option><option>Small Pet</option>
+        </select>
+      </div>
+      <div class="row">
+        <label>Gender</label>
+        <select id="f_gender">
+          <option value="">Any</option><option>Boy</option><option>Girl</option>
+        </select>
+      </div>
+      <div class="row">
+        <label>Age</label>
+        <select id="f_age">
+          <option value="">Any</option>
+          <option value="0-1">&lt; 1 yr</option>
+          <option value="1-3">1–3 yrs</option>
+          <option value="3-7">3–7 yrs</option>
+          <option value="7-99">7+ yrs</option>
+        </select>
+      </div>
+      <div class="row">
+        <label>Size</label>
+        <select id="f_size">
+          <option value="">Any</option><option>XS</option><option>S</option><option>M</option><option>L</option>
+        </select>
+      </div>
+      <div class="row">
+        <label>Special diet</label>
+        <select id="f_diet">
+          <option value="">Any</option><option>Grain-free</option><option>Low-allergen</option><option>Vegetarian</option><option>None</option>
+        </select>
+      </div>
+      <div class="row">
+        <label>Preferred pickup area</label>
+        <select id="f_loc">
+          <option value="">Any</option>
+          <option>Hong Kong Island</option><option>Kowloon</option><option>New Territories</option><option>Lantau</option>
+        </select>
+      </div>
+      <div class="applybar">
+        <button class="btn" id="applyFilters">Apply filters</button>
+        <button class="btn ghost" id="clearFilters">Clear</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAVES -->
+  <section class="screen" id="faves">
+    <div class="grid" id="faveGrid"></div>
+  </section>
+
+  <!-- HELP -->
+  <section class="screen" id="help">
+    <div class="filters">
+      <div>
+        <h3>What is PET PALS?</h3>
+        <p>We connect you with friendly animals for short, face-to-face play sessions to bring comfort and joy. Staff supervise all interactions to ensure animal welfare.</p>
+      </div>
+      <div>
+        <h3>Hong Kong wellbeing resources</h3>
+        <p>If you’re in distress, consider reaching out to local resources such as Samaritans Hong Kong or Mind HK. If you or someone is in immediate danger, call local emergency services.</p>
+      </div>
+      <div>
+        <h3>Contact</h3>
+        <p>Email: hello@petpals.example (demo)</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- COACH (AI dog) -->
+  <div class="coach" id="coach" aria-live="polite">
+    <img class="dog" alt="AI Dog" src="https://img.icons8.com/?size=100&id=22838&format=png" />
+    <div class="bubble">
+      <div id="coachText">Hi! I’m Paws, your AI pup. Tell me your dream pet and I’ll fetch matches. 💖</div>
+      <div class="chiprow">
+        <button class="chip" data-chip="small calm rabbit">Small calm rabbit</button>
+        <button class="chip" data-chip="gentle cat">Gentle cat</button>
+        <button class="chip" data-chip="playful dog">Playful dog</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DETAILS MODAL -->
+  <div class="overlay" id="detailsOverlay" role="dialog" aria-modal="true">
+    <div class="modal">
+      <header style="display:flex;align-items:center;gap:8px;padding:10px 12px">
+        <strong>Pet details</strong>
+        <button class="navbtn close" id="closeDetails">Close</button>
+      </header>
+      <div class="body" id="detailsBody"></div>
+    </div>
+  </div>
+
+  <!-- BOOKING MODAL -->
+  <div class="overlay" id="bookOverlay" role="dialog" aria-modal="true">
+    <div class="modal">
+      <header style="display:flex;align-items:center;gap:8px;padding:10px 12px">
+        <strong>Confirm booking (demo)</strong>
+        <button class="navbtn close" id="closeBook">Close</button>
+      </header>
+      <div class="body">
+        <p>Select a meetup time and confirm. No payment collected in this demo.</p>
+        <div class="applybar">
+          <select id="slot">
+            <option>Today 5:00 PM</option><option>Today 7:30 PM</option><option>Tomorrow 11:00 AM</option><option>Tomorrow 3:00 PM</option>
+          </select>
+          <button class="btn primary" id="confirmBook">Confirm</button>
+        </div>
+      </div>
+      <div class="success" id="bookSuccess" style="display:none">
+        <h3>🎉 Booked!</h3>
+        <p>We’ll send a confirmation email with face-to-face pickup details. (Demo)</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>© PET PALS — Love for Everyone. Images via Unsplash/Icons8 (demo). This prototype does not process payments. For emotional support in Hong Kong, consider contacting local helplines.</p>
+  </footer>
+</div>
+
+<script>
+/* ------------ Dummy data (small, fast, real images) ------------- */
+const PETS = [
+  // Dogs
+  {id:1,species:"Dog",name:"Mochi",age:2,gender:"Girl",size:"S",diet:"Low-allergen",loc:"Hong Kong Island",
+   img:"https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=1200&auto=format&fit=crop"},
+  {id:2,species:"Dog",name:"Bao",age:4,gender:"Boy",size:"M",diet:"Grain-free",loc:"Kowloon",
+   img:"https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=1200&auto=format&fit=crop"},
+  {id:3,species:"Dog",name:"Sunny",age:1,gender:"Girl",size:"XS",diet:"None",loc:"New Territories",
+   img:"https://images.unsplash.com/photo-1574158622682-e40e69881006?q=80&w=1200&auto=format&fit=crop"},
+  // Cats
+  {id:4,species:"Cat",name:"Nori",age:3,gender:"Girl",size:"S",diet:"None",loc:"Hong Kong Island",
+   img:"https://images.unsplash.com/photo-1518791841217-8f162f1e1131?q=80&w=1200&auto=format&fit=crop"},
+  {id:5,species:"Cat",name:"Tiger",age:5,gender:"Boy",size:"M",diet:"Low-allergen",loc:"Kowloon",
+   img:"https://images.unsplash.com/photo-1511044568932-338cba0ad803?q=80&w=1200&auto=format&fit=crop"},
+  {id:6,species:"Cat",name:"Mimi",age:1,gender:"Girl",size:"S",diet:"Grain-free",loc:"New Territories",
+   img:"https://images.unsplash.com/photo-1510337550647-e84f83e341ca?q=80&w=1200&auto=format&fit=crop"},
+  // Rabbits
+  {id:7,species:"Rabbit",name:"Boba",age:1,gender:"Boy",size:"XS",diet:"Vegetarian",loc:"Kowloon",
+   img:"https://images.unsplash.com/photo-1543872084-c7bd3822856d?q=80&w=1200&auto=format&fit=crop"},
+  {id:8,species:"Rabbit",name:"Luna",age:2,gender:"Girl",size:"S",diet:"Vegetarian",loc:"Hong Kong Island",
+   img:"https://images.unsplash.com/photo-1545067829-1f56a6c2c5f5?q=80&w=1200&auto=format&fit=crop"},
+  // Hamsters
+  {id:9,species:"Hamster",name:"Dumpling",age:1,gender:"Boy",size:"XS",diet:"None",loc:"New Territories",
+   img:"https://images.unsplash.com/photo-1612536052582-12afbc90a028?q=80&w=1200&auto=format&fit=crop"},
+  {id:10,species:"Hamster",name:"Peanut",age:2,gender:"Girl",size:"XS",diet:"Low-allergen",loc:"Lantau",
+   img:"https://images.unsplash.com/photo-1604335399105-a0d7b1df4cf3?q=80&w=1200&auto=format&fit=crop"},
+  // Small pets (guinea pigs, chinchillas etc.)
+  {id:11,species:"Small Pet",name:"Churro",age:3,gender:"Boy",size:"S",diet:"Vegetarian",loc:"Kowloon",
+   img:"https://images.unsplash.com/photo-1535242208474-9a2793260ca2?q=80&w=1200&auto=format&fit=crop"},
+  {id:12,species:"Small Pet",name:"Poppy",age:2,gender:"Girl",size:"S",diet:"None",loc:"Hong Kong Island",
+   img:"https://images.unsplash.com/photo-1602067340370-bdcefa60e7c0?q=80&w=1200&auto=format&fit=crop"},
+];
+
+let deck = [...PETS];      // current filtered order
+let index = 0;             // pointer into deck
+let likes = [];            // favourites
+let screeningOK = false;
+
+/* ------------ Simple router ------------- */
+const screens = document.querySelectorAll('.screen');
+const navbtns = document.querySelectorAll('.navbtn');
+function go(id){
+  screens.forEach(s => s.classList.toggle('active', s.id === id));
+  navbtns.forEach(b => b.setAttribute('aria-current', b.dataset.goto===id ? 'page' : 'false'));
+  if(id==='browse'){ renderCard(); }
+  if(id==='faves'){ renderFaves(); }
+}
+navbtns.forEach(b => b.onclick = () => go(b.dataset.goto));
+document.querySelectorAll('.navlink').forEach(a => a.onclick = e => { e.preventDefault(); go(e.target.getAttribute('data-goto')); });
+
+/* ------------ Screening ------------- */
+document.getElementById('screeningPass').onclick = () => {
+  const ok = ['q_age','q_handle','q_allergy','q_supervised','q_commit'].every(id => document.getElementById(id).checked);
+  document.getElementById('screeningMsg').style.display = ok ? 'none' : 'block';
+  screeningOK = ok;
+  if(ok) go('filters');
+};
+
+/* ------------ Choiceboard shortcuts ------------- */
+const dreamInput = document.getElementById('dreamInput');
+document.querySelectorAll('.chip').forEach(c => c.onclick = () => { dreamInput.value = c.dataset.chip; });
+document.getElementById('quickDogs').onclick = ()=>{ setMulti('f_species',['Dog']); go('browse'); }
+document.getElementById('quickCats').onclick = ()=>{ setMulti('f_species',['Cat']); go('browse'); }
+document.getElementById('quickSmall').onclick= ()=>{ setMulti('f_species',['Hamster','Small Pet','Rabbit']); go('browse'); }
+document.getElementById('startNow').onclick = ()=> go('browse');
+
+function setMulti(id, values){
+  const sel = document.getElementById(id);
+  [...sel.options].forEach(o => o.selected = values.includes(o.text));
+  applyFilters();
+}
+
+/* ------------ Filters ------------- */
+document.getElementById('applyFilters').onclick = applyFilters;
+document.getElementById('clearFilters').onclick = () => {
+  ['f_gender','f_age','f_size','f_diet','f_loc'].forEach(id => document.getElementById(id).value='');
+  [...document.getElementById('f_species').options].forEach(o=>o.selected=false);
+  applyFilters();
+}
+function applyFilters(){
+  const species = [...document.getElementById('f_species').selectedOptions].map(o=>o.value);
+  const gender = document.getElementById('f_gender').value;
+  const age = document.getElementById('f_age').value;
+  const size = document.getElementById('f_size').value;
+  const diet = document.getElementById('f_diet').value;
+  const loc = document.getElementById('f_loc').value;
+  const dream = dreamInput.value.toLowerCase();
+
+  deck = PETS.filter(p=>{
+    if(species.length && !species.includes(p.species)) return false;
+    if(gender && p.gender!==gender) return false;
+    if(size && p.size!==size) return false;
+    if(diet && p.diet!==diet) return false;
+    if(loc && p.loc!==loc) return false;
+    if(age){
+      const [a,b]=age.split('-').map(Number);
+      if(!(p.age>=a && p.age<=b)) return false;
+    }
+    // lightweight "dream" match by keywords
+    if(dream){
+      const tags = `${p.species} ${p.name} ${p.gender} ${p.size} ${p.diet}`.toLowerCase();
+      if(!dream.split(/\s+/).some(k=>tags.includes(k))) return false;
+    }
+    return true;
+  });
+  index = 0;
+  if(document.getElementById('browse').classList.contains('active')) renderCard();
+}
+
+/* ------------ Swipe deck ------------- */
+const deckwrap = document.getElementById('deckwrap');
+let dragging = null;
+
+function renderCard(){
+  deckwrap.innerHTML = '';
+  if(index >= deck.length){
+    const empty = document.createElement('div');
+    empty.className='card';
+    empty.innerHTML = `<div class="success"><h3>No more pets with current filters.</h3>
+    <p>Try adjusting filters, or go to <button class="navbtn" onclick="go('filters')">Filters</button>.</p></div>`;
+    deckwrap.appendChild(empty);
+    return;
+  }
+  const p = deck[index];
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.setAttribute('data-id', p.id);
+  card.innerHTML = `
+    <div style="position:relative">
+      <span class="badge">${p.species}</span>
+      <img loading="lazy" src="${p.img}" alt="${p.species} ${p.name}">
+    </div>
+    <div class="meta">
+      <h3>${p.name} • ${p.age} yr ${p.age>1?'s':''} • ${p.gender}</h3>
+      <div class="pillrow">
+        <span class="pill">Size ${p.size}</span>
+        <span class="pill diet">Diet: ${p.diet}</span>
+        <span class="pill loc">Pickup: ${p.loc}</span>
+      </div>
+    </div>
+    <div class="controls" aria-hidden="true"></div>
+  `;
+  deckwrap.appendChild(card);
+
+  // pointer drag
+  let startX=0, startY=0, curX=0, curY=0;
+  function onDown(e){
+    dragging = card; startX = (e.touches?e.touches[0]:e).clientX; startY = (e.touches?e.touches[0]:e).clientY;
+    card.style.transition='none';
+  }
+  function onMove(e){
+    if(!dragging) return;
+    curX = (e.touches?e.touches[0]:e).clientX - startX;
+    curY = (e.touches?e.touches[0]:e).clientY - startY;
+    card.style.transform = `translate(${curX}px, ${curY}px) rotate(${curX/24}deg)`;
+    card.style.opacity = 1 - Math.min(Math.abs(curX)/260, .35);
+  }
+  function onUp(){
+    if(!dragging) return;
+    card.style.transition='transform .25s ease, opacity .25s ease';
+    if(Math.abs(curX) > 120){
+      const dir = curX>0 ? 1 : -1;
+      card.style.transform = `translate(${dir*800}px, ${curY}px) rotate(${dir*15}deg)`;
+      setTimeout(()=> { dir>0 ? like(p) : nope(p); }, 200);
+    }else{
+      card.style.transform = `translate(0,0)`;
+      card.style.opacity = 1;
+    }
+    dragging = null;
+  }
+  card.addEventListener('pointerdown', onDown);
+  window.addEventListener('pointermove', onMove, {passive:true});
+  window.addEventListener('pointerup', onUp);
+}
+
+function like(p){ likes.push(p); index++; renderCard(); openBooking(p); }
+function nope(p){ index++; renderCard(); if(index%3===0) coachSay("Not vibing? Try tweaking filters for a better match."); }
+
+/* Buttons / keyboard */
+document.getElementById('btnLike').onclick = ()=> { if(deck[index]) like(deck[index]); };
+document.getElementById('btnNope').onclick = ()=> { if(deck[index]) nope(deck[index]); };
+document.getElementById('btnInfo').onclick = ()=> openDetails(deck[index]);
+window.addEventListener('keydown', e=>{
+  if(document.getElementById('browse').classList.contains('active')){
+    if(e.key==='ArrowRight') document.getElementById('btnLike').click();
+    if(e.key==='ArrowLeft')  document.getElementById('btnNope').click();
+    if(e.key==='Enter')      document.getElementById('btnInfo').click();
+  }
+});
+
+/* ------------ Details & booking (demo) ------------- */
+const detailsOverlay = document.getElementById('detailsOverlay');
+const detailsBody = document.getElementById('detailsBody');
+document.getElementById('closeDetails').onclick = ()=> detailsOverlay.classList.remove('open');
+
+function openDetails(p){
+  if(!p) return;
+  detailsBody.innerHTML = `
+    <div style="display:grid;grid-template-columns:minmax(200px,1fr) 1fr;gap:12px">
+      <img src="${p.img}" alt="Photo of ${p.name}" style="width:100%;height:260px;object-fit:cover;border-radius:12px">
+      <div>
+        <h2 style="margin-top:0">${p.name}</h2>
+        <p><strong>Species:</strong> ${p.species}<br>
+        <strong>Age:</strong> ${p.age} yr<br>
+        <strong>Gender:</strong> ${p.gender}<br>
+        <strong>Size:</strong> ${p.size}<br>
+        <strong>Diet:</strong> ${p.diet}<br>
+        <strong>Preferred pickup:</strong> ${p.loc}<br>
+        <strong>Session price (demo):</strong> HKD ${p.size==='L'?380:p.size==='M'?300:p.size==='S'?240:200}</p>
+        <div class="applybar">
+          <button class="btn primary" onclick="openBookingById(${p.id})">Book this pet</button>
+          <button class="btn" onclick="addFave(${p.id})">Add to favourites</button>
+        </div>
+      </div>
+    </div>`;
+  detailsOverlay.classList.add('open');
+}
+
+function openBooking(p){
+  // minimal feel-good loop without real payment
+  if(!screeningOK){ go('home'); coachSay("Please complete the quick suitability screening before booking."); return; }
+  document.getElementById('bookSuccess').style.display='none';
+  document.getElementById('bookOverlay').classList.add('open');
+}
+function openBookingById(id){ openBooking(PETS.find(x=>x.id===id)); }
+document.getElementById('closeBook').onclick = ()=> document.getElementById('bookOverlay').classList.remove('open');
+document.getElementById('confirmBook').onclick = ()=>{
+  document.getElementById('bookSuccess').style.display='block';
+  coachSay("Booked! We'll email meetup details. Bring your best cuddles 💛");
+}
+
+/* ------------ Favourites ------------- */
+function addFave(id){
+  const p = PETS.find(x=>x.id===id);
+  if(!likes.find(x=>x.id===id)) likes.push(p);
+  renderFaves();
+}
+function renderFaves(){
+  const g = document.getElementById('faveGrid');
+  if(!likes.length){ g.innerHTML = `<div class="warn">No favourites yet. Swipe some pets and tap ♥.</div>`; return;}
+  g.innerHTML = likes.map(p=>`
+    <div class="mini">
+      <img src="${p.img}" alt="${p.name}">
+      <div class="pad">
+        <strong>${p.name}</strong><br>
+        ${p.species} • ${p.age} yr • ${p.gender}<br>
+        <small>${p.size} • ${p.diet} • ${p.loc}</small>
+        <div class="applybar" style="margin-top:6px">
+          <button class="btn" onclick="openDetails(${p.id})">Details</button>
+          <button class="btn primary" onclick="openBookingById(${p.id})">Book</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ------------ AI dog (coach) typing + nudges ------------- */
+const coachText = document.getElementById('coachText');
+function coachSay(text){
+  coachText.textContent = '';
+  let i=0; const t = setInterval(()=>{ coachText.textContent += text[i++]||''; if(i>text.length) clearInterval(t); }, 12);
+}
+setTimeout(()=> coachSay("Swipe right to like, left to pass. You can also use ← → on keyboard!"), 2200);
+
+/* ------------ Details open by id (helper for inline handlers) ------------- */
+window.openDetails = id => openDetails(PETS.find(x=>x.id===id));
+</script>
 </body>
-
 </html>
